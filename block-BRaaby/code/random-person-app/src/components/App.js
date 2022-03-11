@@ -5,7 +5,6 @@ import '../stylesheet/style.css';
 function App() {
   return (
     <div className="App">
-      {/* <h1> Random User</h1> */}
       <Userdata/>
     </div>
   );

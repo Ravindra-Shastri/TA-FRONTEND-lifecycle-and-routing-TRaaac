@@ -1,20 +1,26 @@
 import React from 'react';
 
-
 export default class Userdata extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       user: null,
-      displayValue: ''
+      displayValue: '',
+      loading: false
     }
   }
 
   getRandomUser = () => {
+    this.setState({ loading: true });
     fetch("https://randomuser.me/api/")
       .then((res) => res.json())
       .then((data) =>
-        this.setState({ user: data.results[0] }))
+        this.setState({
+          user: data.results[0],
+          displayValue: { value: data?.results?.[0]?.email, type: 'My email is' },
+          loading: false
+        }))
+      .finally(() => this.setState({ loading: false }));
   }
 
   componentDidMount() {
@@ -25,43 +31,43 @@ export default class Userdata extends React.Component {
     const { user: { name: { title, first, last } } } = this.state;
     this.setState({
       displayValue:
-        { value: `${title} ${first} ${last}`, type: <span>My name is</span> }
+        { value: `${title} ${first} ${last}`, type: "My name is" }
     });
   };
 
   displayEmail = () => {
-    const { user: { email: email } } = this.state;
+    const { user: { email } } = this.state;
     this.setState({
       displayValue:
-        { value: `${email}`, type: <span>My email is</span> }
+        { value: `${email}`, type: "My email is" }
     })
   };
   displayAge = () => {
     const { user: { dob: { age = '' } } } = this.state;
     this.setState({
       displayValue:
-        { value: `${age}`, type: <span>My age is</span> }
+        { value: `${age}`, type: "My age is" }
     })
   };
   displayStreet = () => {
     const { user: { location: { street: { number, name } } } } = this.state;
     this.setState({
       displayValue:
-        { value: `${number} ${name}`, type: <span>My street is</span> }
+        { value: `${number} ${name}`, type: "My street is" }
     })
   };
   displayPhone = () => {
-    const { user: { phone: phone } } = this.state;
+    const { user: { phone } } = this.state;
     this.setState({
       displayValue:
-        { value: `${phone}`, type: <span>My phone number is</span> }
+        { value: `${phone}`, type: "My phone number is" }
     })
   };
   displayPassword = () => {
     const { user: { login: { password } } } = this.state;
     this.setState({
       displayValue:
-        { value: `${password}`, type: <span> My password is</span> }
+        { value: `${password}`, type: 'My password is' }
     })
   };
 
@@ -69,19 +75,16 @@ export default class Userdata extends React.Component {
   render() {
     const user = this.state.user;
 
-    if (!user) {
-      return <h2> Loading... </h2>;
-    }
     return (
       <>
         <div className="main-container">
           <div className="container">
-          <hr/>
+            <hr />
             <div>
               <div className="img-container">
-                <img src={user.picture.large} alt="" />
+                <img src={user?.picture?.large} alt="" />
               </div>
-              
+
               <div className="display">
                 <p className="display-type">
                   {this.state.displayValue.type}
@@ -129,12 +132,13 @@ export default class Userdata extends React.Component {
           <div className="random-btn">
             <button
               className="btn"
-              onClick={this.getRandomUser}>
-              RANDOM USER</button>
+              onClick={this.getRandomUser}
+            >
+              {this.state.loading ? "LOADING ..." : "RANDOM USER"}
+            </button>
           </div>
         </div>
       </>
-
     )
   }
 }
